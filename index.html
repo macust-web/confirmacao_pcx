@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirmação Pontos de Conexão — RGE</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --navy:    #1a3a5c;
+    --navy2:   #1e4976;
+    --blue:    #2563a8;
+    --blue-lt: #d6e4f7;
+    --blue-lt2:#eaf1fb;
+    --green:   #2a9d4e;
+    --border:  #d0dce8;
+    --border2: #e8eef5;
+    --bg:      #f4f7fb;
+    --white:   #ffffff;
+    --text:    #1a2e45;
+    --text2:   #4a6580;
+    --text3:   #7a95ad;
+    --radius:  8px;
+    --shadow:  0 2px 8px rgba(26,58,92,.10);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Source Sans 3',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:60px; }
+
+  /* HEADER */
+  header { background:var(--navy); padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:60px; box-shadow:0 2px 6px rgba(0,0,0,.25); position:sticky; top:0; z-index:100; }
+  .header-brand { display:flex; align-items:center; gap:10px; color:#fff; font-size:1rem; font-weight:700; }
+  .brand-icon { width:32px; height:32px; background:rgba(255,255,255,.15); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+  #headerMeta { font-size:.72rem; color:rgba(255,255,255,.55); font-weight:400; }
+
+  /* PAGE TITLE */
+  .page-title-bar { background:var(--white); border-bottom:1px solid var(--border); padding:14px 24px; }
+  .page-title-bar h2 { font-size:.95rem; font-weight:700; color:var(--navy); display:flex; align-items:center; gap:8px; }
+  .page-title-bar h2::before { content:''; display:inline-block; width:4px; height:18px; background:var(--blue); border-radius:2px; }
+
+  /* LOADING */
+  #loadingOverlay { position:fixed; inset:0; z-index:999; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+  #loadingOverlay.hidden { display:none; }
+  .spinner { width:38px; height:38px; border:3px solid var(--border); border-top-color:var(--blue); border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  #loadingOverlay p { color:var(--text2); font-size:.85rem; }
+
+  /* ERROR */
+  #errorBanner { display:none; background:#fff5f5; border:1px solid #f5b7b1; border-left:4px solid #e74c3c; border-radius:var(--radius); padding:14px 18px; margin:16px 24px; font-size:.84rem; line-height:1.6; color:#922b21; }
+  #errorBanner.show { display:block; }
+  #errorBanner code { background:#fce8e6; padding:1px 5px; border-radius:3px; font-family:monospace; }
+
+  /* WRAP */
+  .wrap { max-width:760px; margin:0 auto; padding:20px 16px 0; }
+
+  /* SEARCH */
+  .search-section { margin-bottom:16px; }
+  .search-label { font-size:.78rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
+  .search-box { position:relative; }
+  .search-box input { width:100%; background:var(--white); border:1.5px solid var(--border); border-radius:var(--radius); padding:11px 16px 11px 42px; color:var(--text); font-family:'Source Sans 3',sans-serif; font-size:.95rem; outline:none; transition:border-color .2s,box-shadow .2s; box-shadow:var(--shadow); }
+  .search-box input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,168,.12); }
+  .search-box input:disabled { background:#f0f4f8; color:var(--text3); }
+  .search-box input::placeholder { color:var(--text3); }
+  .search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--text3); font-size:1rem; pointer-events:none; }
+
+  /* DROPDOWN */
+  .dropdown { position:relative; z-index:200; margin-top:2px; }
+  .dropdown-list { background:var(--white); border:1.5px solid var(--blue); border-radius:var(--radius); overflow:hidden; display:none; max-height:250px; overflow-y:auto; box-shadow:0 8px 24px rgba(26,58,92,.15); }
+  .dropdown-list.open { display:block; }
+  .dropdown-item { padding:10px 16px; cursor:pointer; border-bottom:1px solid var(--border2); transition:background .12s; }
+  .dropdown-item:last-child { border-bottom:none; }
+  .dropdown-item:hover { background:var(--blue-lt2); }
+  .di-ponto { font-size:.88rem; font-weight:600; color:var(--navy); }
+  .di-rrm { font-size:.74rem; color:var(--text3); margin-top:2px; }
+
+  /* RECORD CARD */
+  .record-card { background:var(--white); border:1px solid var(--border); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); animation:fadeUp .25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .card-header { background:var(--navy); padding:16px 20px; }
+  .card-header .ponto-nome { font-size:1rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; }
+  .card-header .tags { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .tag { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:2px 10px; font-size:.71rem; color:rgba(255,255,255,.85); font-weight:600; }
+
+  /* SECTION DIVIDER */
+  .section-divider { background:var(--blue-lt2); border-top:1px solid var(--border2); border-bottom:1px solid var(--border2); padding:7px 20px; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--navy2); display:flex; align-items:center; gap:6px; }
+
+  /* PERSONS GRID */
+  .persons-grid { display:grid; grid-template-columns:1fr 1fr; }
+  @media (max-width:520px) { .persons-grid { grid-template-columns:1fr; } }
+  .person-block { padding:14px 20px; border-right:1px solid var(--border2); border-bottom:1px solid var(--border2); }
+  .person-block:nth-child(even) { border-right:none; }
+  @media (max-width:520px) { .person-block { border-right:none; } }
+
+  .person-role { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; display:flex; align-items:center; gap:5px; }
+  .person-role.monitor    { color:var(--blue); }
+  .person-role.anciao     { color:#7b4e00; }
+  .person-role.secretario { color:var(--green); }
+  .person-role.resp-tec   { color:#6b3fa0; }
+
+  .person-name { font-size:.9rem; font-weight:600; color:var(--navy); margin-bottom:5px; line-height:1.3; }
+  .person-name.vago { color:var(--text3); font-style:italic; font-weight:400; }
+  .person-detail { display:flex; align-items:flex-start; gap:6px; font-size:.77rem; color:var(--text2); margin-top:3px; word-break:break-all; line-height:1.4; }
+  .person-detail .ic { flex-shrink:0; margin-top:1px; }
+
+  /* MESSAGES */
+  .messages-section { padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
+  .msg-card { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .msg-card-header { background:var(--blue-lt2); padding:9px 14px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--border); }
+  .msg-title { font-size:.74rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:6px; }
+  .msg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .msg-dot.amarelo { background:#e9a82e; }
+  .msg-dot.verde   { background:var(--green); }
+
+  .btn-copy { background:var(--white); border:1.5px solid var(--border); border-radius:6px; padding:5px 13px; color:var(--navy); font-size:.76rem; font-family:'Source Sans 3',sans-serif; font-weight:600; cursor:pointer; transition:all .18s; display:flex; align-items:center; gap:5px; white-space:nowrap; }
+  .btn-copy:hover { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .btn-copy.copied { background:var(--green); border-color:var(--green); color:#fff; }
+
+  .msg-body { padding:14px 16px; font-size:.82rem; line-height:1.8; color:var(--text); white-space:pre-wrap; font-family:'Source Sans 3',sans-serif; max-height:260px; overflow-y:auto; background:var(--white); }
+
+  /* UPDATE TIP */
+  .update-tip { margin-top:16px; }
+  .update-tip details { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+  .update-tip summary { padding:11px 16px; cursor:pointer; font-size:.82rem; font-weight:600; color:var(--navy); list-style:none; display:flex; align-items:center; gap:7px; user-select:none; }
+  .update-tip summary:hover { background:var(--blue-lt2); }
+  .update-tip .tip-body { padding:4px 16px 14px; font-size:.8rem; color:var(--text2); line-height:1.8; border-top:1px solid var(--border2); }
+  .update-tip .tip-body ol { padding-left:18px; margin-top:8px; }
+  .update-tip .tip-body li { margin-bottom:4px; }
+  .update-tip .tip-body code { background:var(--blue-lt2); border:1px solid var(--border); border-radius:4px; padding:1px 5px; font-family:monospace; font-size:.78rem; color:var(--blue); }
+  .tip-note { margin-top:10px; padding:10px 12px; background:var(--blue-lt2); border-left:3px solid var(--blue); border-radius:0 4px 4px 0; font-size:.78rem; color:var(--navy2); }
+
+  /* EMPTY STATE */
+  .empty-state { text-align:center; padding:50px 20px; color:var(--text3); }
+  .empty-state .es-icon { width:64px; height:64px; margin:0 auto 14px; background:var(--blue-lt2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
+  .empty-state p { font-size:.88rem; line-height:1.6; color:var(--text2); }
+
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Carregando planilha de dados...</p>
+</div>
+
+<header>
+  <div class="header-brand">
+    <div class="brand-icon">📡</div>
+    Confirmação · Pontos de Conexão
+  </div>
+  <span id="headerMeta">Carregando...</span>
+</header>
+
+<div class="page-title-bar">
+  <h2>Consulta e Geração de Mensagens</h2>
+</div>
+
+<div id="errorBanner"></div>
+
+<div class="wrap">
+  <div class="search-section">
+    <div class="search-label">Ponto de Conexão</div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Digite o nome ou região para buscar..." autocomplete="off" disabled />
+    </div>
+    <div class="dropdown">
+      <div class="dropdown-list" id="dropdownList"></div>
+    </div>
+  </div>
+
+  <div id="mainContent">
+    <div class="empty-state">
+      <div class="es-icon">⏳</div>
+      <p>Aguardando carregamento dos dados...</p>
+    </div>
+  </div>
+
+  <div class="update-tip">
+    <details>
+      <summary>📂 Como atualizar os dados da planilha?</summary>
+      <div class="tip-body">
+        <ol>
+          <li>Atualize sua planilha normalmente no Excel.</li>
+          <li>Salve o arquivo com o nome exato: <code>pontos.xlsx</code></li>
+          <li>Acesse seu repositório no GitHub.</li>
+          <li>Clique em <code>pontos.xlsx</code> → <strong>Upload files</strong> → arraste o novo arquivo → <strong>Commit changes</strong>.</li>
+          <li>Aguarde cerca de 1 minuto e recarregue o site — os dados já estarão atualizados!</li>
+        </ol>
+        <div class="tip-note">
+          💡 O site lê sempre a <strong>primeira aba</strong> da planilha, independente do nome dela. As colunas devem estar na mesma ordem da planilha original.
+        </div>
+      </div>
+    </details>
+  </div>
+</div>
+
+<script>
+let DB = [];
+function s(v){ return v==null?'':String(v).trim(); }
+function rowToRecord(row){
+  return {
+    rrm:s(row[0]),ra:s(row[1]),ponto:s(row[2]),
+    monitor1_nome:s(row[3]),monitor1_email:s(row[4]),monitor1_cel:s(row[5]),
+    monitor2_nome:s(row[6]),monitor2_email:s(row[7]),monitor2_cel:s(row[8]),
+    monitor3_nome:s(row[9]),monitor3_email:s(row[10]),monitor3_cel:s(row[11]),
+    anciao_nome:s(row[12]),anciao_cel:s(row[13]),anciao_email:s(row[14]),
+    secretario_nome:s(row[15]),secretario_tel:s(row[16]),secretario_email:s(row[17]),
+    resp_tec_nome:s(row[18]),resp_tec_cel:s(row[19]),resp_tec_email:s(row[20]),
+  };
+}
+
+async function loadExcel(){
+  try{
+    const resp=await fetch('pontos.xlsx',{cache:'no-cache'});
+    if(!resp.ok) throw new Error(`Arquivo não encontrado (HTTP ${resp.status}). Certifique-se de que <code>pontos.xlsx</code> está na raiz do repositório.`);
+    const buffer=await resp.arrayBuffer();
+    const wb=XLSX.read(buffer,{type:'array'});
+    const sheetName=wb.SheetNames[0];
+    const ws=wb.Sheets[sheetName];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    DB=rows.slice(1).filter(r=>s(r[2])).map(rowToRecord).filter(r=>r.ponto);
+    if(!DB.length) throw new Error('Nenhum registro encontrado na planilha.');
+    document.getElementById('headerMeta').textContent=`${sheetName} · ${DB.length} pontos`;
+    const inp=document.getElementById('searchInput');
+    inp.disabled=false;
+    inp.placeholder='Digite o nome ou região para buscar...';
+    document.getElementById('mainContent').innerHTML=`
+      <div class="empty-state">
+        <div class="es-icon">📡</div>
+        <p>Digite o nome do Ponto de Conexão<br>no campo acima para buscar.</p>
+      </div>`;
+  }catch(err){
+    showError(err.message);
+  }finally{
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+}
+
+function showError(msg){
+  const el=document.getElementById('errorBanner');
+  el.innerHTML=`⚠️ <strong>Erro ao carregar os dados:</strong><br>${msg}`;
+  el.classList.add('show');
+  document.getElementById('mainContent').innerHTML=`
+    <div class="empty-state"><div class="es-icon">❌</div>
+    <p>Não foi possível carregar os dados.<br>Veja a mensagem acima.</p></div>`;
+  document.getElementById('headerMeta').textContent='Erro ao carregar';
+}
+
+function msgInicial(r){
+  return `A Paz de Deus!\n\nTudo bem com os irmãos?\n\nEstou compartilhando as informações dos pontos de conexão para manter a base atualizada.\n\n*Ponto de Conexão:* ${r.ponto}\n*RRM:* ${r.rrm}\n\n*Ancião:* ${r.anciao_nome}\n*Cel:* ${r.anciao_cel}\n\n*Secretário:* ${r.secretario_nome}\n*Cel:* ${r.secretario_tel}\n\n*Resp. Técnico:* ${r.resp_tec_nome}\n*Cel:* ${r.resp_tec_cel}\n\n*Poderiam, por favor, confirmar se está tudo certo?*\n\nDeus Abençoe!`;
+}
+
+function msgConfirmacao(r){
+  let txt=`⛔ *ATUALIZAÇÃO DOS PONTOS DE CONEXÃO (PCs)*\n\n ➡️ *ATUALIZAÇÃO DOS PONTOS DE CONEXÃO (PCs)*\n\n*RRM:* ${r.rrm}  -  *RA:* ${r.ra}  -  *PC:* ${r.ponto}`;
+  txt+=`\n\n*👁 Monitor 1*\nNome: ${r.monitor1_nome||'-'}\nCel: ${r.monitor1_cel||'-'}\nEmail: ${r.monitor1_email||'-'}`;
+  if(r.monitor2_nome&&r.monitor2_nome.toLowerCase()!=='vago') txt+=`\n\n*👁 Monitor 2*\nNome: ${r.monitor2_nome}\nCel: ${r.monitor2_cel||'-'}\nEmail: ${r.monitor2_email||'-'}`;
+  if(r.monitor3_nome&&r.monitor3_nome.toLowerCase()!=='vago') txt+=`\n\n*👁 Monitor 3*\nNome: ${r.monitor3_nome}\nCel: ${r.monitor3_cel||'-'}\nEmail: ${r.monitor3_email||'-'}`;
+  txt+=`\n\n*⛪ Ancião*\nNome: ${r.anciao_nome||'-'}\nCel: ${r.anciao_cel||'-'}\nEmail: ${r.anciao_email||'-'}`;
+  txt+=`\n\n*📋 Secretário*\nNome: ${r.secretario_nome||'-'}\nCel: ${r.secretario_tel||'-'}\nEmail: ${r.secretario_email||'-'}`;
+  txt+=`\n\n*🔧 Resp. Técnico*\nNome: ${r.resp_tec_nome||'-'}\nCel: ${r.resp_tec_cel||'-'}\nEmail: ${r.resp_tec_email||'-'}`;
+  return txt;
+}
+
+function personBlock(role,roleClass,icon,nome,cel,email){
+  const isVago=!nome||nome.toLowerCase()==='vago';
+  return `<div class="person-block">
+    <div class="person-role ${roleClass}">${icon} ${role}</div>
+    <div class="person-name ${isVago?'vago':''}">${isVago?'Não informado':nome}</div>
+    ${cel?`<div class="person-detail"><span class="ic">📱</span><span>${cel}</span></div>`:''}
+    ${email?`<div class="person-detail"><span class="ic">✉️</span><span>${email}</span></div>`:''}
+  </div>`;
+}
+
+function renderRecord(r){
+  const mons=[];
+  if(r.monitor1_nome) mons.push({n:1,nome:r.monitor1_nome,cel:r.monitor1_cel,email:r.monitor1_email});
+  if(r.monitor2_nome) mons.push({n:2,nome:r.monitor2_nome,cel:r.monitor2_cel,email:r.monitor2_email});
+  if(r.monitor3_nome) mons.push({n:3,nome:r.monitor3_nome,cel:r.monitor3_cel,email:r.monitor3_email});
+  document.getElementById('mainContent').innerHTML=`
+  <div class="record-card">
+    <div class="card-header">
+      <div class="ponto-nome">📡 ${r.ponto}</div>
+      <div class="tags"><span class="tag">RRM: ${r.rrm}</span><span class="tag">RA: ${r.ra}</span></div>
+    </div>
+    <div class="section-divider">👥 Pessoas envolvidas</div>
+    <div class="persons-grid">
+      ${mons.map(m=>personBlock(`Monitor ${m.n}`,'monitor','👁',m.nome,m.cel,m.email)).join('')}
+      ${personBlock('Ancião','anciao','⛪',r.anciao_nome,r.anciao_cel,r.anciao_email)}
+      ${personBlock('Secretário','secretario','📋',r.secretario_nome,r.secretario_tel,r.secretario_email)}
+      ${personBlock('Resp. Técnico','resp-tec','🔧',r.resp_tec_nome,r.resp_tec_cel,r.resp_tec_email)}
+    </div>
+    <div class="section-divider">💬 Mensagens para WhatsApp</div>
+    <div class="messages-section">
+      <div class="msg-card">
+        <div class="msg-card-header">
+          <span class="msg-title"><span class="msg-dot amarelo"></span>Mensagem Inicial — para Monitores</span>
+          <button class="btn-copy" onclick="copyMsg('msgInicial',this)">📋 Copiar</button>
+        </div>
+        <div class="msg-body" id="msgInicial">${escHtml(msgInicial(r))}</div>
+      </div>
+      <div class="msg-card">
+        <div class="msg-card-header">
+          <span class="msg-title"><span class="msg-dot verde"></span>Mensagem de Confirmação — Ancião / Secretário</span>
+          <button class="btn-copy" onclick="copyMsg('msgConfirmacao',this)">📋 Copiar</button>
+        </div>
+        <div class="msg-body" id="msgConfirmacao">${escHtml(msgConfirmacao(r))}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function copyMsg(id,btn){
+  const text=document.getElementById(id)?.innerText||'';
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✅ Copiado!'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='📋 Copiar'; btn.classList.remove('copied'); },2200);
+  });
+}
+
+const searchInput=document.getElementById('searchInput');
+const ddList=document.getElementById('dropdownList');
+function norm(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+searchInput.addEventListener('input',()=>{
+  const q=norm(searchInput.value.trim());
+  if(!q||!DB.length){ ddList.classList.remove('open'); return; }
+  const hits=DB.filter(r=>norm(r.ponto).includes(q)||norm(r.rrm).includes(q)||norm(r.ra).includes(q));
+  if(!hits.length){ ddList.classList.remove('open'); return; }
+  ddList.innerHTML=hits.map(r=>`
+    <div class="dropdown-item" data-ponto="${escHtml(r.ponto)}">
+      <div class="di-ponto">📡 ${r.ponto}</div>
+      <div class="di-rrm">RRM: ${r.rrm}</div>
+    </div>`).join('');
+  ddList.classList.add('open');
+});
+
+ddList.addEventListener('click',e=>{
+  const item=e.target.closest('.dropdown-item');
+  if(!item) return;
+  const r=DB.find(x=>x.ponto===item.dataset.ponto);
+  if(!r) return;
+  searchInput.value=r.ponto;
+  ddList.classList.remove('open');
+  renderRecord(r);
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+document.addEventListener('click',e=>{ if(!e.target.closest('.search-section')) ddList.classList.remove('open'); });
+searchInput.addEventListener('keydown',e=>{ if(e.key==='Escape') ddList.classList.remove('open'); if(e.key==='Enter') ddList.querySelector('.dropdown-item')?.click(); });
+
+loadExcel();
+</script>
+</body>
+</html>
