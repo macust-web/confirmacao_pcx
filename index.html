@@ -33,10 +33,13 @@
   .brand-icon { width:32px; height:32px; background:rgba(255,255,255,.15); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
   #headerMeta { font-size:.72rem; color:rgba(255,255,255,.55); font-weight:400; }
 
-  /* PAGE TITLE */
-  .page-title-bar { background:var(--white); border-bottom:1px solid var(--border); padding:14px 24px; }
-  .page-title-bar h2 { font-size:.95rem; font-weight:700; color:var(--navy); display:flex; align-items:center; gap:8px; }
-  .page-title-bar h2::before { content:''; display:inline-block; width:4px; height:18px; background:var(--blue); border-radius:2px; }
+  /* TABS */
+  .tabs-bar { background:var(--white); border-bottom:2px solid var(--border); display:flex; position:sticky; top:60px; z-index:99; }
+  .tab-btn { padding:13px 22px; font-size:.85rem; font-weight:700; color:var(--text2); background:none; border:none; border-bottom:3px solid transparent; cursor:pointer; transition:all .18s; margin-bottom:-2px; display:flex; align-items:center; gap:7px; }
+  .tab-btn:hover { color:var(--navy); background:var(--blue-lt2); }
+  .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
 
   /* LOADING */
   #loadingOverlay { position:fixed; inset:0; z-index:999; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
@@ -51,7 +54,7 @@
   #errorBanner code { background:#fce8e6; padding:1px 5px; border-radius:3px; font-family:monospace; }
 
   /* WRAP */
-  .wrap { max-width:760px; margin:0 auto; padding:20px 16px 0; }
+  .wrap { max-width:820px; margin:0 auto; padding:20px 16px 0; }
 
   /* SEARCH */
   .search-section { margin-bottom:16px; }
@@ -76,7 +79,6 @@
   /* RECORD CARD */
   .record-card { background:var(--white); border:1px solid var(--border); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); animation:fadeUp .25s ease; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
   .card-header { background:var(--navy); padding:16px 20px; }
   .card-header .ponto-nome { font-size:1rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; }
   .card-header .tags { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
@@ -91,17 +93,13 @@
   .person-block { padding:14px 20px; border-right:1px solid var(--border2); border-bottom:1px solid var(--border2); }
   .person-block:nth-child(even) { border-right:none; }
   @media (max-width:520px) { .person-block { border-right:none; } }
-
-  .person-role { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; display:flex; align-items:center; gap:5px; }
-  .person-role.monitor    { color:var(--blue); }
+  .person-role { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
   .person-role.anciao     { color:#7b4e00; }
   .person-role.secretario { color:var(--green); }
   .person-role.resp-tec   { color:#6b3fa0; }
-
   .person-name { font-size:.9rem; font-weight:600; color:var(--navy); margin-bottom:5px; line-height:1.3; }
   .person-name.vago { color:var(--text3); font-style:italic; font-weight:400; }
   .person-detail { display:flex; align-items:flex-start; gap:6px; font-size:.77rem; color:var(--text2); margin-top:3px; word-break:break-all; line-height:1.4; }
-  .person-detail .ic { flex-shrink:0; margin-top:1px; }
 
   /* MESSAGES */
   .messages-section { padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
@@ -109,14 +107,13 @@
   .msg-card-header { background:var(--blue-lt2); padding:9px 14px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--border); }
   .msg-title { font-size:.74rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:6px; }
   .msg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .msg-dot.amarelo { background:#e9a82e; }
-  .msg-dot.verde   { background:var(--green); }
-
+  .msg-dot.verde { background:var(--green); }
   .btn-copy { background:var(--white); border:1.5px solid var(--border); border-radius:6px; padding:5px 13px; color:var(--navy); font-size:.76rem; font-family:'Source Sans 3',sans-serif; font-weight:600; cursor:pointer; transition:all .18s; display:flex; align-items:center; gap:5px; white-space:nowrap; }
   .btn-copy:hover { background:var(--blue); border-color:var(--blue); color:#fff; }
   .btn-copy.copied { background:var(--green); border-color:var(--green); color:#fff; }
-
   .msg-body { padding:14px 16px; font-size:.82rem; line-height:1.8; color:var(--text); white-space:pre-wrap; font-family:'Source Sans 3',sans-serif; max-height:260px; overflow-y:auto; background:var(--white); }
+  .btn-whatsapp { background:#25d366; border:none; border-radius:6px; padding:7px 16px; color:#fff; font-size:.78rem; font-family:'Source Sans 3',sans-serif; font-weight:700; cursor:pointer; transition:all .18s; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; text-decoration:none; }
+  .btn-whatsapp:hover { background:#1da851; }
 
   /* UPDATE TIP */
   .update-tip { margin-top:16px; }
@@ -134,24 +131,57 @@
   .empty-state .es-icon { width:64px; height:64px; margin:0 auto 14px; background:var(--blue-lt2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
   .empty-state p { font-size:.88rem; line-height:1.6; color:var(--text2); }
 
-  /* WHATSAPP BUTTON */
-  .btn-whatsapp { background:#25d366; border:none; border-radius:6px; padding:7px 16px; color:#fff; font-size:.78rem; font-family:'Source Sans 3',sans-serif; font-weight:700; cursor:pointer; transition:all .18s; display:flex; align-items:center; gap:6px; white-space:nowrap; }
-  .btn-whatsapp:hover { background:#1da851; }
+  /* ===== CHECKLIST GLOBAL ===== */
+  .checklist-wrap { max-width:820px; margin:0 auto; padding:20px 16px 0; }
 
-  /* STATUS CONTROL TABLE */
-  .status-section { padding:0 20px 20px; }
-  .status-title { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--navy2); margin-bottom:10px; padding:7px 0; border-bottom:1px solid var(--border2); }
-  .status-table { width:100%; border-collapse:collapse; font-size:.82rem; }
-  .status-table th { background:var(--blue-lt2); color:var(--navy); font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; padding:8px 12px; border:1px solid var(--border); text-align:left; }
-  .status-table td { padding:9px 12px; border:1px solid var(--border); vertical-align:middle; }
-  .status-table tr.row-enviado td { background:#fffbe6; }
-  .status-table tr.row-confirmado td { background:#e8f8ee; }
-  .status-table tr.row-enviado.row-confirmado td { background:#e8f8ee; }
-  .status-table td:first-child { font-weight:600; color:var(--navy); }
-  .status-table td.tipo-label { font-size:.72rem; color:var(--text2); font-weight:400; }
-  .chk-cell { text-align:center; }
-  .chk-label { display:inline-flex; align-items:center; justify-content:center; gap:5px; cursor:pointer; font-size:.75rem; font-weight:600; }
-  .chk-label input[type=checkbox] { width:16px; height:16px; accent-color:var(--blue); cursor:pointer; }
+  .checklist-toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+  .checklist-toolbar-left { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .cl-stats { font-size:.8rem; color:var(--text2); display:flex; gap:14px; flex-wrap:wrap; }
+  .cl-stat { display:flex; align-items:center; gap:5px; font-weight:600; }
+  .cl-stat-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .cl-stat-dot.s-none    { background:var(--border); border:1px solid var(--text3); }
+  .cl-stat-dot.s-enviado { background:#e9a82e; }
+  .cl-stat-dot.s-conf    { background:var(--green); }
+  .btn-reset-all { background:var(--white); border:1.5px solid #e74c3c; border-radius:6px; padding:6px 13px; color:#e74c3c; font-size:.75rem; font-family:'Source Sans 3',sans-serif; font-weight:700; cursor:pointer; transition:all .18s; }
+  .btn-reset-all:hover { background:#e74c3c; color:#fff; }
+
+  .cl-filter { display:flex; gap:6px; flex-wrap:wrap; }
+  .cl-filter-btn { padding:5px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--white); font-size:.74rem; font-weight:700; color:var(--text2); cursor:pointer; transition:all .15s; }
+  .cl-filter-btn:hover { border-color:var(--blue); color:var(--blue); }
+  .cl-filter-btn.active { background:var(--blue); border-color:var(--blue); color:#fff; }
+
+  .cl-search-box { position:relative; margin-bottom:12px; }
+  .cl-search-box input { width:100%; background:var(--white); border:1.5px solid var(--border); border-radius:var(--radius); padding:9px 14px 9px 38px; color:var(--text); font-family:'Source Sans 3',sans-serif; font-size:.88rem; outline:none; transition:border-color .2s; box-shadow:var(--shadow); }
+  .cl-search-box input:focus { border-color:var(--blue); }
+  .cl-search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text3); font-size:.9rem; pointer-events:none; }
+
+  .cl-table-wrap { background:var(--white); border:1px solid var(--border); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); }
+  .cl-table { width:100%; border-collapse:collapse; font-size:.83rem; }
+  .cl-table thead tr { background:var(--navy); }
+  .cl-table thead th { color:#fff; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; padding:11px 14px; text-align:left; white-space:nowrap; }
+  .cl-table thead th.chk-col { text-align:center; width:95px; }
+  .cl-table tbody tr { border-bottom:1px solid var(--border2); transition:background .12s; }
+  .cl-table tbody tr:last-child { border-bottom:none; }
+  .cl-table tbody tr.st-enviado td   { background:#fffbe6; }
+  .cl-table tbody tr.st-confirmado td { background:#e8f8ee; }
+  .cl-table td { padding:10px 14px; vertical-align:middle; }
+  .cl-table td.col-rrm { font-size:.74rem; color:var(--text2); white-space:nowrap; }
+  .cl-table td.col-ra  { font-size:.74rem; color:var(--text2); white-space:nowrap; }
+  .cl-table td.col-pc  { font-weight:600; color:var(--navy); }
+  .cl-table td.chk-col { text-align:center; }
+  .cl-chk input[type=checkbox] { width:17px; height:17px; cursor:pointer; accent-color:var(--blue); }
+  .cl-chk input[type=checkbox].chk-conf { accent-color:var(--green); }
+
+  .cl-badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:.68rem; font-weight:700; }
+  .cl-badge.b-none    { background:var(--border2); color:var(--text3); }
+  .cl-badge.b-enviado { background:#fff3cd; color:#856404; border:1px solid #ffe69c; }
+  .cl-badge.b-conf    { background:#d1f5e0; color:#1a6636; border:1px solid #a3e6be; }
+
+  .cl-no-results { text-align:center; padding:40px 20px; color:var(--text3); font-size:.85rem; }
+
+  @media (max-width:600px) {
+    .cl-table td.col-ra, .cl-table thead th:nth-child(2) { display:none; }
+  }
 
   ::-webkit-scrollbar { width:5px; }
   ::-webkit-scrollbar-track { background:transparent; }
@@ -173,53 +203,115 @@
   <span id="headerMeta">Carregando...</span>
 </header>
 
-<div class="page-title-bar">
-  <h2>Consulta e Geração de Mensagens</h2>
+<div class="tabs-bar">
+  <button class="tab-btn active" id="btnTabConsulta" onclick="switchTab('tab-consulta',this)">🔍 Consulta / Mensagem</button>
+  <button class="tab-btn" id="btnTabControle" onclick="switchTab('tab-controle',this)">📊 Controle Geral</button>
 </div>
 
 <div id="errorBanner"></div>
 
-<div class="wrap">
-  <div class="search-section">
-    <div class="search-label">Ponto de Conexão</div>
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="Digite o nome ou região para buscar..." autocomplete="off" disabled />
-    </div>
-    <div class="dropdown">
-      <div class="dropdown-list" id="dropdownList"></div>
-    </div>
-  </div>
-
-  <div id="mainContent">
-    <div class="empty-state">
-      <div class="es-icon">⏳</div>
-      <p>Aguardando carregamento dos dados...</p>
-    </div>
-  </div>
-
-  <div class="update-tip">
-    <details>
-      <summary>📂 Como atualizar os dados da planilha?</summary>
-      <div class="tip-body">
-        <ol>
-          <li>Atualize sua planilha normalmente no Excel.</li>
-          <li>Salve o arquivo com o nome exato: <code>pontos.xlsx</code></li>
-          <li>Acesse seu repositório no GitHub.</li>
-          <li>Clique em <code>pontos.xlsx</code> → <strong>Upload files</strong> → arraste o novo arquivo → <strong>Commit changes</strong>.</li>
-          <li>Aguarde cerca de 1 minuto e recarregue o site — os dados já estarão atualizados!</li>
-        </ol>
-        <div class="tip-note">
-          💡 O site lê sempre a <strong>primeira aba</strong> da planilha, independente do nome dela. As colunas devem estar na mesma ordem da planilha original.
-        </div>
+<!-- TAB 1: CONSULTA -->
+<div id="tab-consulta" class="tab-panel active">
+  <div class="wrap">
+    <div class="search-section">
+      <div class="search-label">Ponto de Conexão</div>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Digite o nome ou região para buscar..." autocomplete="off" disabled />
       </div>
-    </details>
+      <div class="dropdown">
+        <div class="dropdown-list" id="dropdownList"></div>
+      </div>
+    </div>
+    <div id="mainContent">
+      <div class="empty-state">
+        <div class="es-icon">⏳</div>
+        <p>Aguardando carregamento dos dados...</p>
+      </div>
+    </div>
+    <div class="update-tip">
+      <details>
+        <summary>📂 Como atualizar os dados da planilha?</summary>
+        <div class="tip-body">
+          <ol>
+            <li>Atualize sua planilha normalmente no Excel.</li>
+            <li>Salve o arquivo com o nome exato: <code>pontos.xlsx</code></li>
+            <li>Acesse seu repositório no GitHub.</li>
+            <li>Clique em <code>pontos.xlsx</code> → <strong>Upload files</strong> → arraste o novo arquivo → <strong>Commit changes</strong>.</li>
+            <li>Aguarde cerca de 1 minuto e recarregue o site — os dados já estarão atualizados!</li>
+          </ol>
+          <div class="tip-note">
+            💡 O site lê sempre a <strong>primeira aba</strong> da planilha, independente do nome dela. As colunas devem estar na mesma ordem da planilha original.
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: CONTROLE GERAL -->
+<div id="tab-controle" class="tab-panel">
+  <div class="checklist-wrap">
+    <div class="checklist-toolbar">
+      <div class="checklist-toolbar-left">
+        <div class="cl-stats" id="clStats">—</div>
+        <button class="btn-reset-all" onclick="resetAll()">🔄 Limpar tudo</button>
+      </div>
+      <div class="cl-filter">
+        <button class="cl-filter-btn active" onclick="setFilter('todos',this)">Todos</button>
+        <button class="cl-filter-btn" onclick="setFilter('pendente',this)">Pendente</button>
+        <button class="cl-filter-btn" onclick="setFilter('enviado',this)">Enviado</button>
+        <button class="cl-filter-btn" onclick="setFilter('confirmado',this)">Confirmado</button>
+      </div>
+    </div>
+    <div class="cl-search-box">
+      <span class="cl-search-icon">🔍</span>
+      <input type="text" id="clSearchInput" placeholder="Filtrar por nome, RRM ou RA..." autocomplete="off" oninput="renderChecklist()"/>
+    </div>
+    <div class="cl-table-wrap">
+      <div id="clTableContainer"><div class="cl-no-results">Aguardando dados...</div></div>
+    </div>
   </div>
 </div>
 
 <script>
 let DB = [];
+const STORAGE_KEY = 'pc_status_v1';
+let clFilter = 'todos';
+
+/* ---- localStorage ---- */
+function loadStatus(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); }catch(e){ return {}; }
+}
+function saveStatus(data){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+}
+function getStatus(ponto){
+  return (loadStatus()[ponto])||{enviado:false,confirmado:false};
+}
+function setStatus(ponto,field,val){
+  const d=loadStatus();
+  if(!d[ponto]) d[ponto]={enviado:false,confirmado:false};
+  d[ponto][field]=val;
+  if(field==='confirmado'&&val) d[ponto].enviado=true;       // confirmar implica enviado
+  if(field==='enviado'&&!val)   d[ponto].confirmado=false;   // desmarcar enviado limpa confirmado
+  saveStatus(d);
+}
+
+/* ---- TABS ---- */
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='tab-controle') renderChecklist();
+}
+
+/* ---- HELPERS ---- */
 function s(v){ return v==null?'':String(v).trim(); }
+function escHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function norm(str){ return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
 function rowToRecord(row){
   return {
     rrm:s(row[0]),ra:s(row[1]),ponto:s(row[2]),
@@ -232,6 +324,7 @@ function rowToRecord(row){
   };
 }
 
+/* ---- EXCEL ---- */
 async function loadExcel(){
   try{
     const resp=await fetch('pontos.xlsx',{cache:'no-cache'});
@@ -263,111 +356,67 @@ function showError(msg){
   const el=document.getElementById('errorBanner');
   el.innerHTML=`⚠️ <strong>Erro ao carregar os dados:</strong><br>${msg}`;
   el.classList.add('show');
-  document.getElementById('mainContent').innerHTML=`
-    <div class="empty-state"><div class="es-icon">❌</div>
-    <p>Não foi possível carregar os dados.<br>Veja a mensagem acima.</p></div>`;
+  document.getElementById('mainContent').innerHTML=`<div class="empty-state"><div class="es-icon">❌</div><p>Não foi possível carregar os dados.<br>Veja a mensagem acima.</p></div>`;
   document.getElementById('headerMeta').textContent='Erro ao carregar';
 }
 
+/* ---- MESSAGES ---- */
 function msgInicial(r){
   return `A Paz de Deus!\n\nTudo bem com os irmãos?\n\nEstou compartilhando as informações dos pontos de conexão para manter a base atualizada.\n\n*Ponto de Conexão:* ${r.ponto}\n*RRM:* ${r.rrm}\n\n*Ancião:* ${r.anciao_nome}\n*Cel:* ${r.anciao_cel}\n\n*Secretário:* ${r.secretario_nome}\n*Cel:* ${r.secretario_tel}\n\n*Resp. Técnico:* ${r.resp_tec_nome}\n*Cel:* ${r.resp_tec_cel}\n\n*Poderiam, por favor, confirmar se está tudo certo?*\n\nDeus Abençoe!`;
 }
-
 function msgConfirmacao(r){
-  let txt=msgInicial(r);
+  let txt=`A Paz de Deus!\n\nTudo bem com os irmãos?\n\nEstou compartilhando as informações dos pontos de conexão para manter a base atualizada.`;
   txt+=`\n\n⛔ *ATUALIZAÇÃO DOS PONTOS DE CONEXÃO (PCs)*`;
   txt+=`\n\n*RRM:* ${r.rrm}  -  \n*RA:* ${r.ra}  -  \n*PC:* ${r.ponto}`;
   txt+=`\n\n*Ancião*\nNome: ${r.anciao_nome||'-'}\nCel: ${r.anciao_cel||'-'}\nEmail: ${r.anciao_email||'-'}`;
   txt+=`\n\n*Secretário*\nNome: ${r.secretario_nome||'-'}\nCel: ${r.secretario_tel||'-'}\nEmail: ${r.secretario_email||'-'}`;
   txt+=`\n\n*Resp. Técnico*\nNome: ${r.resp_tec_nome||'-'}\nCel: ${r.resp_tec_cel||'-'}\nEmail: ${r.resp_tec_email||'-'}`;
+  txt+=`\n\n*Poderiam, por favor, confirmar se está tudo certo?*\n\nDeus Abençoe!`;
   return txt;
 }
 
-function personBlock(role,roleClass,icon,nome,cel,email){
+/* ---- PERSON BLOCK ---- */
+function personBlock(role,roleClass,nome,cel,email){
   const isVago=!nome||nome.toLowerCase()==='vago';
   return `<div class="person-block">
-    <div class="person-role ${roleClass}">${icon} ${role}</div>
-    <div class="person-name ${isVago?'vago':''}">${isVago?'Não informado':nome}</div>
-    ${cel?`<div class="person-detail"><span class="ic">📱</span><span>${cel}</span></div>`:''}
-    ${email?`<div class="person-detail"><span class="ic">✉️</span><span>${email}</span></div>`:''}
+    <div class="person-role ${roleClass}">${role}</div>
+    <div class="person-name ${isVago?'vago':''}">${isVago?'Não informado':escHtml(nome)}</div>
+    ${cel?`<div class="person-detail"><span>📱</span><span>${escHtml(cel)}</span></div>`:''}
+    ${email?`<div class="person-detail"><span>✉️</span><span>${escHtml(email)}</span></div>`:''}
   </div>`;
 }
 
-function statusTable(r){
-  const rows=[
-    {label:'RRM', tipo:r.rrm},
-    {label:'RA', tipo:r.ra},
-    {label:'PC', tipo:r.ponto},
-  ];
-  return `
-  <div class="status-section">
-    <div class="status-title">📊 Controle de Confirmações</div>
-    <table class="status-table">
-      <thead>
-        <tr>
-          <th>Tipo</th>
-          <th>Nome / Região</th>
-          <th class="chk-cell">Enviado</th>
-          <th class="chk-cell">Confirmado</th>
-        </tr>
-      </thead>
-      <tbody id="statusTbody">
-        ${rows.map((row,i)=>`
-        <tr id="statusRow${i}">
-          <td class="tipo-label">${row.label}</td>
-          <td>${row.tipo||'-'}</td>
-          <td class="chk-cell"><label class="chk-label"><input type="checkbox" onchange="statusChange(${i},'enviado',this)"> Enviado</label></td>
-          <td class="chk-cell"><label class="chk-label"><input type="checkbox" onchange="statusChange(${i},'confirmado',this)"> Confirmado</label></td>
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-}
-
-function statusChange(rowIdx, tipo, chk){
-  const tr=document.getElementById('statusRow'+rowIdx);
-  if(tipo==='confirmado'){
-    if(chk.checked){ tr.classList.add('row-confirmado'); tr.classList.remove('row-enviado'); }
-    else tr.classList.remove('row-confirmado');
-  } else {
-    if(chk.checked && !tr.classList.contains('row-confirmado')) tr.classList.add('row-enviado');
-    else if(!chk.checked) tr.classList.remove('row-enviado');
-  }
-}
-
+/* ---- RENDER RECORD ---- */
 function renderRecord(r){
   const msgConf=msgConfirmacao(r);
   const waUrl='https://wa.me/?text='+encodeURIComponent(msgConf);
   document.getElementById('mainContent').innerHTML=`
   <div class="record-card">
     <div class="card-header">
-      <div class="ponto-nome">📡 ${r.ponto}</div>
-      <div class="tags"><span class="tag">RRM: ${r.rrm}</span><span class="tag">RA: ${r.ra}</span></div>
+      <div class="ponto-nome">📡 ${escHtml(r.ponto)}</div>
+      <div class="tags"><span class="tag">RRM: ${escHtml(r.rrm)}</span><span class="tag">RA: ${escHtml(r.ra)}</span></div>
     </div>
     <div class="section-divider">👥 Pessoas envolvidas</div>
     <div class="persons-grid">
-      ${personBlock('Ancião','anciao','',r.anciao_nome,r.anciao_cel,r.anciao_email)}
-      ${personBlock('Secretário','secretario','',r.secretario_nome,r.secretario_tel,r.secretario_email)}
-      ${personBlock('Resp. Técnico','resp-tec','',r.resp_tec_nome,r.resp_tec_cel,r.resp_tec_email)}
+      ${personBlock('Ancião','anciao',r.anciao_nome,r.anciao_cel,r.anciao_email)}
+      ${personBlock('Secretário','secretario',r.secretario_nome,r.secretario_tel,r.secretario_email)}
+      ${personBlock('Resp. Técnico','resp-tec',r.resp_tec_nome,r.resp_tec_cel,r.resp_tec_email)}
     </div>
     <div class="section-divider">💬 Mensagem para WhatsApp</div>
     <div class="messages-section">
       <div class="msg-card">
         <div class="msg-card-header">
           <span class="msg-title"><span class="msg-dot verde"></span>Mensagem de Confirmação — Ancião / Secretário / Resp. Técnico</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
             <button class="btn-copy" onclick="copyMsg('msgConfirmacao',this)">📋 Copiar</button>
-            <a href="${escHtml(waUrl)}" target="_blank"><button class="btn-whatsapp">📲 WhatsApp</button></a>
+            <a class="btn-whatsapp" href="${escHtml(waUrl)}" target="_blank">📲 WhatsApp</a>
           </div>
         </div>
         <div class="msg-body" id="msgConfirmacao">${escHtml(msgConf)}</div>
       </div>
     </div>
-    ${statusTable(r)}
   </div>`;
 }
-
-function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function copyMsg(id,btn){
   const text=document.getElementById(id)?.innerText||'';
@@ -377,9 +426,9 @@ function copyMsg(id,btn){
   });
 }
 
+/* ---- DROPDOWN SEARCH ---- */
 const searchInput=document.getElementById('searchInput');
 const ddList=document.getElementById('dropdownList');
-function norm(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 
 searchInput.addEventListener('input',()=>{
   const q=norm(searchInput.value.trim());
@@ -388,12 +437,11 @@ searchInput.addEventListener('input',()=>{
   if(!hits.length){ ddList.classList.remove('open'); return; }
   ddList.innerHTML=hits.map(r=>`
     <div class="dropdown-item" data-ponto="${escHtml(r.ponto)}">
-      <div class="di-ponto">📡 ${r.ponto}</div>
-      <div class="di-rrm">RRM: ${r.rrm}</div>
+      <div class="di-ponto">📡 ${escHtml(r.ponto)}</div>
+      <div class="di-rrm">RRM: ${escHtml(r.rrm)}</div>
     </div>`).join('');
   ddList.classList.add('open');
 });
-
 ddList.addEventListener('click',e=>{
   const item=e.target.closest('.dropdown-item');
   if(!item) return;
@@ -404,9 +452,99 @@ ddList.addEventListener('click',e=>{
   renderRecord(r);
   window.scrollTo({top:0,behavior:'smooth'});
 });
-
 document.addEventListener('click',e=>{ if(!e.target.closest('.search-section')) ddList.classList.remove('open'); });
 searchInput.addEventListener('keydown',e=>{ if(e.key==='Escape') ddList.classList.remove('open'); if(e.key==='Enter') ddList.querySelector('.dropdown-item')?.click(); });
+
+/* ---- CHECKLIST GLOBAL ---- */
+function setFilter(f,btn){
+  clFilter=f;
+  document.querySelectorAll('.cl-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChecklist();
+}
+
+function renderChecklist(){
+  if(!DB.length){
+    document.getElementById('clTableContainer').innerHTML='<div class="cl-no-results">Aguardando carregamento dos dados...</div>';
+    return;
+  }
+  const q=norm(document.getElementById('clSearchInput').value||'');
+  const allStatus=loadStatus();
+
+  // stats (sobre todos, ignorando filtro/busca)
+  let nPend=0,nEnv=0,nConf=0;
+  DB.forEach(r=>{
+    const st=allStatus[r.ponto]||{};
+    if(st.confirmado) nConf++;
+    else if(st.enviado) nEnv++;
+    else nPend++;
+  });
+  document.getElementById('clStats').innerHTML=`
+    <span class="cl-stat"><span class="cl-stat-dot s-none"></span>${nPend} pendente${nPend!==1?'s':''}</span>
+    <span class="cl-stat"><span class="cl-stat-dot s-enviado"></span>${nEnv} enviado${nEnv!==1?'s':''}</span>
+    <span class="cl-stat"><span class="cl-stat-dot s-conf"></span>${nConf} confirmado${nConf!==1?'s':''}</span>`;
+
+  // filtro de linhas
+  const rows=DB.filter(r=>{
+    if(q && !norm(r.ponto).includes(q) && !norm(r.rrm).includes(q) && !norm(r.ra).includes(q)) return false;
+    const st=allStatus[r.ponto]||{enviado:false,confirmado:false};
+    if(clFilter==='pendente')   return !st.enviado&&!st.confirmado;
+    if(clFilter==='enviado')    return st.enviado&&!st.confirmado;
+    if(clFilter==='confirmado') return !!st.confirmado;
+    return true;
+  });
+
+  if(!rows.length){
+    document.getElementById('clTableContainer').innerHTML='<div class="cl-no-results">Nenhum ponto encontrado para este filtro.</div>';
+    return;
+  }
+
+  const tbody=rows.map((r,i)=>{
+    const st=allStatus[r.ponto]||{enviado:false,confirmado:false};
+    const rowClass=st.confirmado?'st-confirmado':st.enviado?'st-enviado':'';
+    const badge=st.confirmado
+      ?'<span class="cl-badge b-conf">✅ Confirmado</span>'
+      :st.enviado
+        ?'<span class="cl-badge b-enviado">📤 Enviado</span>'
+        :'<span class="cl-badge b-none">— Pendente</span>';
+    const safePonto=encodeURIComponent(r.ponto);
+    return `<tr id="clr-${i}" class="${rowClass}">
+      <td class="col-rrm">${escHtml(r.rrm)}</td>
+      <td class="col-ra">${escHtml(r.ra)}</td>
+      <td class="col-pc">${escHtml(r.ponto)}</td>
+      <td class="chk-col">${badge}</td>
+      <td class="chk-col"><label class="cl-chk" title="Enviado"><input type="checkbox" ${st.enviado?'checked':''} onchange="clToggle('${safePonto}','enviado',this)"></label></td>
+      <td class="chk-col"><label class="cl-chk" title="Confirmado"><input type="checkbox" class="chk-conf" ${st.confirmado?'checked':''} onchange="clToggle('${safePonto}','confirmado',this)"></label></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('clTableContainer').innerHTML=`
+    <table class="cl-table">
+      <thead>
+        <tr>
+          <th>RRM</th>
+          <th>RA</th>
+          <th>Ponto de Conexão</th>
+          <th>Status</th>
+          <th class="chk-col">Enviado</th>
+          <th class="chk-col">Confirmado</th>
+        </tr>
+      </thead>
+      <tbody>${tbody}</tbody>
+    </table>`;
+}
+
+function clToggle(encodedPonto,field,chk){
+  const ponto=decodeURIComponent(encodedPonto);
+  setStatus(ponto,field,chk.checked);
+  renderChecklist();
+}
+
+function resetAll(){
+  if(!confirm('Limpar todos os status de Enviado/Confirmado?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  renderChecklist();
+}
 
 loadExcel();
 </script>
